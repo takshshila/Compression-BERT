@@ -2,10 +2,10 @@ from datasets import load_dataset
 import torch
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, DataCollatorWithPadding
-tokenizer=None
+#tokenizer=None
 
-def loadData(model_ckpt, benchmark, data, batch_size):
-    tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+def loadData(tokenizer, model_ckpt, benchmark, data, batch_size):
+    #tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     def prepare_train_features(examples):
         tokenized_examples = tokenizer(
             examples["hypothesis"],
@@ -26,7 +26,7 @@ def loadData(model_ckpt, benchmark, data, batch_size):
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     train_loader = DataLoader(dataset['train'], shuffle=True, batch_size=batch_size, collate_fn=data_collator)
     eval_loader = DataLoader(dataset['validation_matched'], batch_size=batch_size, collate_fn=data_collator)
-    return tokenizer, train_loader, eval_loader
+    return  train_loader, eval_loader
 
 
 #loadData()
