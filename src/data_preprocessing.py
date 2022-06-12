@@ -2,10 +2,12 @@ from datasets import load_dataset
 import torch
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, DataCollatorWithPadding
-#tokenizer=None
+
+
+# tokenizer=None
 
 def loadData(tokenizer, model_ckpt, benchmark, data, batch_size):
-    #tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+    # tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     def prepare_train_features(examples):
         tokenized_examples = tokenizer(
             examples["hypothesis"],
@@ -14,6 +16,7 @@ def loadData(tokenizer, model_ckpt, benchmark, data, batch_size):
             truncation=True
         )
         return tokenized_examples
+
     dataset = load_dataset(benchmark, data)
 
     dataset = dataset.map(prepare_train_features, batched=True)
@@ -21,15 +24,21 @@ def loadData(tokenizer, model_ckpt, benchmark, data, batch_size):
     dataset = dataset.rename_column("label", "labels")
     dataset.set_format("torch")
 
-    #print(dataset)
+    # print(dataset)
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     train_loader = DataLoader(dataset['train'], shuffle=True, batch_size=batch_size, collate_fn=data_collator)
     eval_loader = DataLoader(dataset['validation_matched'], batch_size=batch_size, collate_fn=data_collator)
-    return  train_loader, eval_loader
+    return train_loader, eval_loader
 
 
-#loadData()
+def count_params(model):
+    tot_params = 0
+    for layer_name, param in model.named_parameters():
+        tot_params += torch.count_nonzero(param.data)
+
+    return tot_params
+# loadData()
 
 
 
